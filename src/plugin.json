@@ -1,0 +1,35 @@
+{
+  "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
+  "type": "datasource",
+  "name": "FetchMate",
+  "id": "dorianrod-fetchmate-datasource",
+  "metrics": true,
+  "backend": true,
+  "alerting": true,
+  "executable": "gpx_fetchmate",
+  "info": {
+    "description": "",
+    "author": {
+      "name": "Dorian Rodriguez"
+    },
+    "keywords": [
+      "datasource",
+      "ai",
+      "sql"
+    ],
+    "logos": {
+      "small": "img/icon.png",
+      "large": "img/icon.png"
+    },
+    "screenshots": [
+      {"name": "Exploring", "path": "img/explore.png"},
+      {"name": "Adding new datasource", "path": "img/settings.png"}
+    ],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=10.0.3",
+    "plugins": []
+  }
+}

@@ -1,0 +1,159 @@
+apiVersion: 1
+
+datasources:
+  - name: MySQL
+    editable: true
+    type: mysql
+    uid: mysql
+    access: direct
+    url: 10.10.0.13:3306
+    user: root
+    jsonData:
+      database: supermarket
+    secureJsonData:
+      password: root
+
+  - name: Products dataset
+    editable: true
+    isDefault: false
+    type: dorianrod-fetchmate-datasource
+    uid: aiproducts
+    url: 'http://10.10.0.80:5010/'
+    jsonData:
+      source: mysql
+      context: 'The dataset is a data warehouse with one fact and dimensions tables'
+      tables:
+        - name: dim_dates
+          description: ''
+          fields:
+            - name: date
+              description: ''
+              type: date
+            - name: id
+              description: ''
+              type: char
+        - name: dim_products
+          description: 'List of products'
+          fields:
+            - name: category
+              description: 'Category of product. Only possible values: Fruits, Vegetables, Meat, Fish, Seafood, Dairy, Bakery, Snacks, Sweets, Frozen Desserts, Frozen Food, Pantry, Condiments, Personal Care, Household, Electronics, Accessories, Apparel, Footwear, Sports Equipment, Fitness Equipment'
+              type: varchar
+            - name: id
+              description: ''
+              type: int
+            - name: label
+              description: 'Name of product'
+              type: varchar
+        - name: dim_stores
+          description: 'List of stores'
+          fields:
+            - name: id
+              description: ''
+              type: int
+            - name: label
+              description: ''
+              type: varchar
+        - name: fact_sales
+          description: "Represents sales data including date, discount, price, product_id, quantity, and store_id. 'id' field is the primary key."
+          fields:
+            - name: date_id
+              description: ''
+              type: varchar
+            - name: discount
+              description: ''
+              type: decimal
+            - name: id
+              description: ''
+              type: int
+            - name: price
+              description: ''
+              type: decimal
+            - name: product_id
+              description: ''
+              type: int
+            - name: quantity
+              description: ''
+              type: int
+            - name: store_id
+              description: ''
+              type: int
+
+  - name: Basket dataset
+    editable: true
+    isDefault: false
+    type: dorianrod-fetchmate-datasource
+    uid: aibasket
+    url: 'http://10.10.0.80:5010/'
+    jsonData:
+      source: mysql
+      context: 'The dataset is a data warehouse with one fact and dimensions tables. Basket is '
+      tables:
+        - name: dim_customers
+          description: 'List of businesses'
+          fields:
+            - name: address
+              description: ''
+              type: varchar
+            - name: city
+              description: ''
+              type: varchar
+            - name: country
+              description: 'Only possible values: USA, France, Spain'
+              type: varchar
+            - name: customer_name
+              description: ''
+              type: varchar
+            - name: email
+              description: ''
+              type: varchar
+            - name: id
+              description: ''
+              type: int
+            - name: phone_number
+              description: ''
+              type: varchar
+            - name: postal_code
+              description: ''
+              type: varchar
+            - name: state
+              description: ''
+              type: varchar
+        - name: dim_dates
+          description: 'Dates list: each row represents a day'
+          fields:
+            - name: date
+              description: ''
+              type: date
+            - name: id
+              description: ''
+              type: char
+        - name: dim_stores
+          description: 'List of stores'
+          fields:
+            - name: id
+              description: ''
+              type: int
+            - name: label
+              description: ''
+              type: varchar
+        - name: fact_average_basket
+          description: 'Represents orders by customers in a retail environment. Each row in this table provides details about a specific transaction. The basket is calculated as the sum(total_amount) / sum(number_of_items)'
+          fields:
+            - name: customer_id
+              description: 'FK to dim_customers'
+              type: int
+            - name: date_id
+              description: 'FK to dim_dates'
+              type: varchar
+            - name: id
+              description: 'Unique order id'
+              type: int
+            - name: number_of_items
+              description: 'The count of items included in the order, indicating how many products were purchased on average during the transaction.'
+              type: int
+            - name: store_id
+              description: 'FK to dim_stores'
+              type: int
+            - name: total_amount
+              description: 'Total monetary value of the order, calculated by summing the prices of all items in the order.'
+              type: decimal

@@ -1,0 +1,56 @@
+version: '3.0'
+
+services:
+  grafana:
+    container_name: gf_fetchmate
+    restart: on-failure
+    build:
+      context: ./.config
+      args:
+        grafana_image: ${GRAFANA_IMAGE:-grafana-enterprise}
+        grafana_version: ${GRAFANA_VERSION:-10.0.3}
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q --no-check-certificate --spider http://localhost:3000/api/health']
+      interval: 10s
+    ports:
+      - 3000:3000/tcp
+    volumes:
+      - ./dist:/var/lib/grafana/plugins/dorianrod-datasource-fetchmate
+      - ./provisioning:/etc/grafana/provisioning
+    networks:
+      fetchmate:
+        ipv4_address: 10.10.0.12
+
+  mysql:
+    image: mysql
+    container_name: gf_mysql
+    restart: on-failure
+    healthcheck:
+      test: 'docker exec gf_mysql /usr/bin/mysql --user=root --password=root --execute "SHOW DATABASES;'
+      interval: 10s
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: base
+    volumes:
+      - ./provisioning/datasources/mysql/1-structure.sql:/docker-entrypoint-initdb.d/1-structure.sql
+      - ./provisioning/datasources/mysql/2-data.sql:/docker-entrypoint-initdb.d/2-data.sql
+    networks:
+      fetchmate:
+        ipv4_address: 10.10.0.13
+
+  fetchmate:
+    image: rodriguezdorian/fetchmate:1.0.0
+    networks:
+      fetchmate:
+        ipv4_address: 10.10.0.80
+    environment:
+      OPENAPI_KEY_API: ${OPENAPI_KEY_API}
+      DEBUG_RESPONSE: 0
+
+networks:
+  fetchmate:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: '10.10.0.0/24'
